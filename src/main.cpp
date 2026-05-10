@@ -26,7 +26,7 @@ class $modify(MyAccountLayer, AccountLayer) {
         toggle->setScale(0.7f);
         toggle->toggle(false);
         m_fields->m_closeToggle = toggle;
-        auto label = CCLabelBMFont::create("Close Game after successful save?", "bigFont.fnt");
+        auto label = CCLabelBMFont::create("close GD after successful save", "bigFont.fnt");
         label->setScale(0.35f);
         label->setAnchorPoint({ 0.f, 0.5f });
         auto menu = CCMenu::create();
