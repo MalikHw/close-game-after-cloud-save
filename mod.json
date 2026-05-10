@@ -6,7 +6,7 @@
         "android": "2.2081",
         "ios": "2.2081"
     },
-    "version": "1.0.0",
+    "version": "1.1.0",
     "id": "malikhw47.close-game-after-cloud-save",
     "name": "Close game after cloud save",
     "developer": "MalikHw47",
