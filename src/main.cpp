@@ -42,7 +42,7 @@ class $modify(MyAccountLayer, AccountLayer) {
     virtual void backupAccountFinished() {
         AccountLayer::backupAccountFinished();
         if (m_fields->m_closeOnSave) {
-            log::info("Backup successful — closing game as requested.");
+            log::info("Backup successful, closing game as requested.");
             // delay
             this->runAction(CCSequence::create(
                 CCDelayTime::create(0.8f),
