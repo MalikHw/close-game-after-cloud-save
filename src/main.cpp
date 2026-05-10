@@ -1,6 +1,5 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/AccountLayer.hpp> // my fucking bad
-#include <Geode/ui/Popup.hpp>
 
 using namespace geode::prelude;
 
@@ -71,15 +70,17 @@ enum class PostSaveAction {
     NOTHING, CLOSE_GD, SHUTDOWN_PC, RESTART_PC, SLEEP_PC, CLOSE_AND_SLEEP
 };
 
-class PostSavePopup : public Popup<std::function<void(PostSaveAction)>> {
+class PostSavePopup : public geode::Popup<std::function<void(PostSaveAction)>> {
 protected:
     std::function<void(PostSaveAction)> m_callback;
     PostSaveAction m_selectedAction = PostSaveAction::NOTHING;
     std::vector<CCMenuItemToggler*> m_radioToggles;
-    bool setup(std::function<void(PostSaveAction)> callback) override {
+    bool init(std::function<void(PostSaveAction)> callback) {
+        if (!geode::Popup<std::function<void(PostSaveAction)>>::init(280.f, 240.f))
+            return false;
         m_callback = callback;
         this->setTitle("After Save Action");
-        auto winSize = this->m_size;
+        auto winSize = CCSize{280.f, 240.f};
         std::vector<std::pair<std::string, PostSaveAction>> options = {
             {"Do Nothing", PostSaveAction::NOTHING},
             {"Close GD", PostSaveAction::CLOSE_GD},
@@ -132,11 +133,11 @@ protected:
 public:
     static PostSavePopup* create(std::function<void(PostSaveAction)> callback) {
         auto ret = new PostSavePopup();
-        if (ret && ret->initAnchored(280.f, 240.f, callback)) {
+        if (ret && ret->init(callback)) {
             ret->autorelease();
             return ret;
         }
-        CC_SAFE_DELETE(ret);
+        delete ret;
         return nullptr;
     }
 };
