@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/AccountLayer.hpp> // my fucking bad
+#include <Geode/ui/Popup.hpp>
 
 using namespace geode::prelude;
 
@@ -26,7 +27,7 @@ class $modify(MyAccountLayer, AccountLayer) {
         label->setScale(0.35f);
         label->setAnchorPoint({ 0.f, 0.5f });
         auto menu = CCMenu::create();
-        menu->setPosition(ccp(winSize.width / 2 - 120.f, 38.f));
+        menu->setPosition(ccp(180.5f, 227.f));
         menu->setContentSize({ 250.f, 30.f });
         toggle->setPosition(ccp(0.f, 0.f));
         menu->addChild(toggle);
@@ -58,7 +59,7 @@ class $modify(MyAccountLayer, AccountLayer) {
         GameManager::sharedState()->save();
         LocalLevelManager::sharedState()->save();
         CCDirector::sharedDirector()->end();
-#if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS)
+#ifdef GEODE_IS_IOS
         exit(0); // my gf told me about it since shes an iphoner
 #endif
     }
@@ -70,7 +71,7 @@ enum class PostSaveAction {
     NOTHING, CLOSE_GD, SHUTDOWN_PC, RESTART_PC, SLEEP_PC, CLOSE_AND_SLEEP
 };
 
-class PostSavePopup : public geode::Popup<std::function<void(PostSaveAction)>> {
+class PostSavePopup : public Popup<std::function<void(PostSaveAction)>> {
 protected:
     std::function<void(PostSaveAction)> m_callback;
     PostSaveAction m_selectedAction = PostSaveAction::NOTHING;
@@ -78,7 +79,7 @@ protected:
     bool setup(std::function<void(PostSaveAction)> callback) override {
         m_callback = callback;
         this->setTitle("After Save Action");
-        auto winSize = this->getContentSize();
+        auto winSize = this->m_size;
         std::vector<std::pair<std::string, PostSaveAction>> options = {
             {"Do Nothing", PostSaveAction::NOTHING},
             {"Close GD", PostSaveAction::CLOSE_GD},
@@ -131,7 +132,7 @@ protected:
 public:
     static PostSavePopup* create(std::function<void(PostSaveAction)> callback) {
         auto ret = new PostSavePopup();
-        if (ret->initAnchored(280.f, 240.f, callback)) {
+        if (ret && ret->initAnchored(280.f, 240.f, callback)) {
             ret->autorelease();
             return ret;
         }
@@ -174,7 +175,7 @@ class $modify(MyAccountLayer, AccountLayer) {
         statusLabel->setScale(0.3f);
         m_fields->m_statusLabel = statusLabel;
         auto menu = CCMenu::create();
-        menu->setPosition(ccp(winSize.width / 2, 38.f));
+        menu->setPosition(ccp(180.5f, 227.f));
         menu->setContentSize({250.f, 50.f});
         button->setPosition(ccp(0.f, 10.f));
         menu->addChild(button);
@@ -216,7 +217,7 @@ class $modify(MyAccountLayer, AccountLayer) {
 #endif
         } else if (action == PostSaveAction::SLEEP_PC) {
 #ifdef GEODE_IS_WINDOWS
-            if (getenv("WINEPREFIX")) {
+            if (std::getenv("WINEPREFIX")) {
                 system("systemctl suspend");
             } else {
                 system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0");
@@ -227,7 +228,7 @@ class $modify(MyAccountLayer, AccountLayer) {
             return; // dont close gd
         } else if (action == PostSaveAction::CLOSE_AND_SLEEP) {
 #ifdef GEODE_IS_WINDOWS
-            if (getenv("WINEPREFIX")) {
+            if (std::getenv("WINEPREFIX")) {
                 system("systemctl suspend &");
             } else {
                 system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0");
@@ -240,8 +241,8 @@ class $modify(MyAccountLayer, AccountLayer) {
             GameManager::sharedState()->save();
             LocalLevelManager::sharedState()->save();
             CCDirector::sharedDirector()->end();
-#if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS)
-            exit(0); // my gf told me about it since shes an iphoner
+#ifdef GEODE_IS_MACOS
+            exit(0);
 #endif
         }
     }
