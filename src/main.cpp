@@ -75,9 +75,8 @@ protected:
     std::function<void(PostSaveAction)> m_callback;
     PostSaveAction m_selectedAction = PostSaveAction::NOTHING;
     std::vector<CCMenuItemToggler*> m_radioToggles;
-    bool init(std::function<void(PostSaveAction)> callback) {
-        if (!geode::Popup<std::function<void(PostSaveAction)>>::init(280.f, 240.f))
-            return false;
+    
+    bool setup(std::function<void(PostSaveAction)> callback) override {
         m_callback = callback;
         this->setTitle("After Save Action");
         auto winSize = CCSize{280.f, 240.f};
@@ -133,11 +132,11 @@ protected:
 public:
     static PostSavePopup* create(std::function<void(PostSaveAction)> callback) {
         auto ret = new PostSavePopup();
-        if (ret && ret->init(callback)) {
+        if (ret->initAnchored(280.f, 240.f, callback)) {
             ret->autorelease();
             return ret;
         }
-        delete ret;
+        CC_SAFE_DELETE(ret);
         return nullptr;
     }
 };
