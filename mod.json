@@ -7,14 +7,13 @@
         "ios": "2.2081"
     },
     "version": "1.0.0",
-    "id": "MalikHw.close-game-after-cloud-save",
-    "name": "close-game-after-cloud-save",
-    "developer": "MalikHw",
-    "description": "desc.",
-    "tags": ["yes", "yeah"],
+    "id": "malikhw47.close-game-after-cloud-save",
+    "name": "Close game after cloud save",
+    "developer": "MalikHw47",
+    "description": "Adds an option that allows you to close the game after cloud save is done",
+    "tags": ["utility"],
     "links": {
         "source": "https://github.com/MalikHw/close-game-after-cloud-save",
         "community": "https://discord.gg/G9bZ92eg2n"
-    },
-    "settings": {}
+    }
 }
