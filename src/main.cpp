@@ -70,13 +70,16 @@ enum class PostSaveAction {
     NOTHING, CLOSE_GD, SHUTDOWN_PC, RESTART_PC, SLEEP_PC, CLOSE_AND_SLEEP
 };
 
-class PostSavePopup : public geode::Popup<std::function<void(PostSaveAction)>> {
+class PostSavePopup : public geode::Popup {
 protected:
     std::function<void(PostSaveAction)> m_callback;
     PostSaveAction m_selectedAction = PostSaveAction::NOTHING;
     std::vector<CCMenuItemToggler*> m_radioToggles;
     
-    bool setup(std::function<void(PostSaveAction)> callback) override {
+    bool init(std::function<void(PostSaveAction)> callback) {
+        if (!Popup::init(280.f, 240.f))
+            return false;
+        
         m_callback = callback;
         this->setTitle("After Save Action");
         auto winSize = CCSize{280.f, 240.f};
@@ -132,7 +135,7 @@ protected:
 public:
     static PostSavePopup* create(std::function<void(PostSaveAction)> callback) {
         auto ret = new PostSavePopup();
-        if (ret->initAnchored(280.f, 240.f, callback)) {
+        if (ret->init(callback)) {
             ret->autorelease();
             return ret;
         }
@@ -145,6 +148,7 @@ class $modify(MyAccountLayer, AccountLayer) {
     struct Fields {
         PostSaveAction m_postSaveAction = PostSaveAction::NOTHING;
         CCLabelBMFont* m_statusLabel = nullptr;
+        bool m_hasShownWarning = false;
     };
     void onActionButton(CCObject*) {
         PostSavePopup::create([this](PostSaveAction action) {
@@ -167,6 +171,12 @@ class $modify(MyAccountLayer, AccountLayer) {
     }
     virtual void customSetup() {
         AccountLayer::customSetup();
+        
+        if (!m_fields->m_hasShownWarning && Loader::get()->isModLoaded("beefyandtheducks.save-on-exit")) {
+            m_fields->m_hasShownWarning = true;
+            FLAlertLayer::create("Warning", "Save On Exit by beefyandtheducks is loaded, which if game closed it'll save TWICE once by me and once by him, so be careful", "OK")->show();
+        }
+        
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         auto buttonSprite = ButtonSprite::create("After Save...", "goldFont.fnt", "GJ_button_04.png", 0.8f);
         buttonSprite->setScale(0.7f);
