@@ -91,7 +91,7 @@ protected:
             {"Sleep PC", PostSaveAction::SLEEP_PC},
             {"Close GD + Sleep PC", PostSaveAction::CLOSE_AND_SLEEP}
         };
-        float startY = winSize.height / 2 + 30.f;
+        float startY = winSize.height / 2 + 30.f + 44.f;
         for (size_t i = 0; i < options.size(); i++) {
             auto& [text, action] = options[i];
             auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
@@ -125,7 +125,10 @@ protected:
         auto clicked = static_cast<CCMenuItemToggler*>(sender);
         m_selectedAction = static_cast<PostSaveAction>(clicked->getTag());
         for (auto toggle : m_radioToggles) {
-            toggle->toggle(static_cast<PostSaveAction>(toggle->getTag()) == m_selectedAction);
+            bool shouldBeOn = (static_cast<PostSaveAction>(toggle->getTag()) == m_selectedAction);
+            if (toggle->isToggled() != shouldBeOn) {
+                toggle->toggle(shouldBeOn);
+            }
         }
     }
     void onOK(CCObject*) {
@@ -185,7 +188,7 @@ class $modify(MyAccountLayer, AccountLayer) {
         statusLabel->setScale(0.3f);
         m_fields->m_statusLabel = statusLabel;
         auto menu = CCMenu::create();
-        menu->setPosition(ccp(180.5f, 227.f));
+        menu->setPosition(ccp(283.5f, 217.f));
         menu->setContentSize({250.f, 50.f});
         button->setPosition(ccp(0.f, 10.f));
         menu->addChild(button);
@@ -215,13 +218,21 @@ class $modify(MyAccountLayer, AccountLayer) {
         auto action = m_fields->m_postSaveAction;
         if (action == PostSaveAction::SHUTDOWN_PC) {
 #ifdef GEODE_IS_WINDOWS
-            system("shutdown /s /t 4");
+            if (std::getenv("WINEPREFIX")) {
+                system("systemctl poweroff");
+            } else {
+                system("shutdown /s /t 4");
+            }
 #elif defined(GEODE_IS_MACOS)
             system("osascript -e 'tell app \"System Events\" to shut down'");
 #endif
         } else if (action == PostSaveAction::RESTART_PC) {
 #ifdef GEODE_IS_WINDOWS
-            system("shutdown /r /t 4");
+            if (std::getenv("WINEPREFIX")) {
+                system("systemctl reboot");
+            } else {
+                system("shutdown /r /t 4");
+            }
 #elif defined(GEODE_IS_MACOS)
             system("osascript -e 'tell app \"System Events\" to restart'");
 #endif
